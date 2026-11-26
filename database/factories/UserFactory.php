@@ -42,4 +42,30 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    public function administrator(): static
+    {
+        return $this->afterCreating(fn (User $user) => $user->assignRole('administrator'));
+    }
+
+    public function headOfDepartment(string $department = 'Информатика'): static
+    {
+        return $this->state(fn () => ['department' => $department])
+            ->afterCreating(fn (User $user) => $user->assignRole('head_of_department'));
+    }
+
+    public function teacher(string $department = 'Информатика'): static
+    {
+        return $this->state(fn () => [
+            'department' => $department,
+            'teacher_code' => fake()->unique()->numerify('T-####'),
+        ])->afterCreating(fn (User $user) => $user->assignRole('teacher'));
+    }
+
+    public function student(): static
+    {
+        return $this->state(fn () => [
+            'student_code' => fake()->unique()->numerify('S-####'),
+        ])->afterCreating(fn (User $user) => $user->assignRole('student'));
+    }
 }

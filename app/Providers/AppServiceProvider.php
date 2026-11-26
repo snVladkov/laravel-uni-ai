@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\User;
+use App\Policies\TeacherPolicy;
+use App\Policies\UserManagementPolicy;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +23,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Gate::policy(User::class, UserManagementPolicy::class);
+
+        Gate::define('manage-teachers', fn (User $user): bool => app(TeacherPolicy::class)->viewAny($user));
+
+        Gate::define('manage-teacher', fn (User $user, User $teacher): bool => app(TeacherPolicy::class)->update($user, $teacher));
     }
 }
